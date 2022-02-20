@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+   
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hack Ifood</title>
+    <link rel="stylesheet" href="./style.css"/>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="content-wrap">
+        <h1> Coloque um vídeo de comida aqui e veja o que acontece</h1>
+        
+        <form>
+            <label for="data" >URL vídeo para teste</label>
+            <input id="data"
+                type="url"
+                placeholder="http://"
+                value=""
+            >
+            <button type="submit">Enviar</button>
+        </form>
+    </div>
+    <div class="item">
+        <div>Com o tensorflow usado via script direto no browser, não precisamos tratar o vídeo para frames. Porém precisa saber usar o webpack para transpilar o código.</div>
+        <div>
+            <img id="img" src="./teste.jpg"/>
+        </div>
+    </div>
+
+     <div class="item">
+        <div>Caixa do match das receitas</div>
+        <div>
+            <img id="img" src="./teste.jpg"/>
+        </div>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs"> </script>
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/coco-ssd"> </script>
+    <script src="./script.js"></script>
+</body>
+</html>
