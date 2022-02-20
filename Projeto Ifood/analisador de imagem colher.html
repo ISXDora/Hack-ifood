@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<!-- saved from url=(0052)https://spoonacular.com/food-api/image-analyzer-demo -->
+<html class="translated-ltr"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+
+<title>analisador de imagem iFood</title>
+<meta name="author" content="David Urbansky">
+<meta name="description" content="A spoonacular sample app.">
+<meta name="keywords" content="spoonacular, sample, app">
+<script src="./analisador de imagem colher_files/anime.min.js.transferir"></script>
+<script src="./analisador de imagem colher_files/vue.js.transferir"></script>
+<link href="./analisador de imagem colher_files/css2" rel="stylesheet">
+<link rel="stylesheet" href="./analisador de imagem colher_files/vue-file-agent.css">
+<script src="./analisador de imagem colher_files/vue-file-agent.umd.js.transferir"></script>
+<link rel="shortcut icon" href="https://spoonacular.com/favicon.ico" type="image/x-icon">
+<link rel="icon" href="https://spoonacular.com/favicon.ico" type="image/x-icon">
+<link type="text/css" rel="stylesheet" charset="UTF-8" href="./analisador de imagem colher_files/translateelement.css"></head>
+<body>
+<div id="app"><h1><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">Deixe o ifood matar sua fome...</font></font></h1> <div id="imageChooser"><div id="vfa-kzvdkf7t6cesefd3muv" class="is-sortable-disabled is-drag-valid theme-undefined" uploadurl="https://api.spoonacular.com/food/images/analyze" maxsize="10MB" maxfiles="1" helptext="Choose an image" errortext="[object Object]"><div class="grid-block-wrapper vue-file-agent file-input-wrapper is-compact is-single"><canvas style="position: fixed; visibility: hidden; z-index: -3;"></canvas><!----><div transitionduration="300" pressdelay="0" helperclass="active-sorting-item"><div><div class="file-preview-wrapper grid-box-item grid-block file-preview-new"><span class="file-preview"><span style="position: absolute; inset: 0px;"><svg viewBox="0 0 1000 1000"><path d="M745,353c-5.6,0-11.3,0.2-17.2,0.7C687.4,237.3,577.8,157,451,157c-162.1,0-294,131.9-294,294c0,2.1,0,4.1,0,6.2C72.6,479,10,555.8,10,647c0,108.1,87.9,196,196,196h245V618.3l-63.4,63.4c-9.6,9.6-22.1,14.4-34.6,14.4s-25.1-4.8-34.6-14.4c-19.2-19.2-19.2-50.1,0-69.3l147-147c4.6-4.6,9.9-8.1,16-10.6c12-4.9,25.5-4.9,37.4,0c6,2.5,11.4,6.1,16,10.6l147,147c19.2,19.2,19.2,50.1,0,69.3c-9.6,9.6-22.1,14.4-34.6,14.4s-25.1-4.8-34.6-14.4L549,618.3V843h196c135.1,0,245-109.9,245-245S880.1,353,745,353z"></path></svg><span class="help-text"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">Escolha o arquivo ou arraste e solte aqui</font></font></span></span></span></div></div></div><input title="" type="file" accept="image/*" class="file-input"></div></div></div> <p><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">&lt;- carregue uma imagem aqui, ou veja-a com uma </font></font><a href="https://spoonacular.com/food-api/image-analyzer-demo#"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">imagem de demonstração </font></font></a><span style="position: relative; top: 16px; left: 5px;"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">⤦</font></font></span> <img align="right" src="./analisador de imagem colher_files/635350-240x150.jpg" id="demoImg"></p> <div style="clear: both;"></div> <!----></div>
+<script>
+        var app = new Vue({
+            el: '#app',
+            mounted() {
+            },
+            data: function () {
+                return {
+                    spoonacularApiKey: '871cc9ddc1ea4733830dd2c30e3d691a', // REPLACE THIS DEMO KEY, get a free key here: https://spoonacular.com/food-api
+                    demoImageUrl: 'https://spoonacular.com/recipeImages/635350-240x150.jpg',
+                    uploadUrl: 'https://api.spoonacular.com/food/images/analyze',
+                    uploadHeaders: {},
+                    foodImages: [],
+                    analyzed: false,
+                    analyzedImage: {
+                        nutrition: {
+                            recipesUsed: 0,
+                            calories: {
+                                value: 0,
+                                unit: 'calories'
+                            },
+                            fat: {
+                                value: 0,
+                                unit: 'g'
+                            },
+                            protein: {
+                                value: 0,
+                                unit: 'g'
+                            },
+                            carbs: {
+                                value: 0,
+                                unit: 'g'
+                            },
+                        },
+                        category: {
+                            name: '',
+                            probability: 0
+                        },
+                        recipes: []
+                    },
+                    nutrition: {
+                        animationMaxWidth: 630, // maximum length for nutrition bars
+                        calories100: 800, // number of calories to reach max length
+                        protein100: 30, // number of grams of protein to reach max length
+                        fat100: 30, // number of grams of fat to reach max length
+                        carbs100: 30, // number of grams of carbs to reach max length
+                        calories: 0,
+                        protein: 0,
+                        fat: 0,
+                        carbs: 0
+                    }
+                };
+            },
+            computed: {
+                probabilityText() {
+                    if (this.analyzedImage.category.probability < 0.2) {
+                        return 'I am really unsure about that!';
+                    }
+                    if (this.analyzedImage.category.probability < 0.4) {
+                        return 'Maybe - maybe not though.';
+                    }
+                    if (this.analyzedImage.category.probability < 0.6) {
+                        return 'Not really sure but looks like it.';
+                    }
+                    if (this.analyzedImage.category.probability < 0.8) {
+                        return 'I am rather confident in that.';
+                    }
+                    if (this.analyzedImage.category.probability < 1) {
+                        return 'I\'m almost certain!';
+                    }
+                }
+            },
+            methods: {
+                animate() {
+                    let self = this;
+                    var nutritionTimeline = anime.timeline({
+                        duration: 800,
+                        easing: 'easeInOutQuad',
+                    });
+                    nutritionTimeline.add(
+                        {
+                            targets: 'div#calories div',
+                            width: self.nutrition.animationMaxWidth * Math.min(1, self.analyzedImage.nutrition.calories.value / self.nutrition.calories100),
+                            update: function (anim) {
+                                self.nutrition.calories = Math.round(self.analyzedImage.nutrition.calories.value * anim.progress / 100);
+                            },
+                        }).add({
+                            targets: 'div#fat div',
+                            width: self.nutrition.animationMaxWidth * Math.min(1, self.analyzedImage.nutrition.fat.value / self.nutrition.fat100),
+                            update: function (anim) {
+                                self.nutrition.fat = Math.round(self.analyzedImage.nutrition.fat.value * anim.progress / 100);
+                            },
+                        }).add({
+                            targets: 'div#protein div',
+                            width: self.nutrition.animationMaxWidth * Math.min(1, self.analyzedImage.nutrition.protein.value / self.nutrition.protein100),
+                            update: function (anim) {
+                                self.nutrition.protein = Math.round(self.analyzedImage.nutrition.protein.value * anim.progress / 100);
+                            },
+                        }).add({
+                            targets: 'div#carbs div',
+                            width: self.nutrition.animationMaxWidth * Math.min(1, self.analyzedImage.nutrition.carbs.value / self.nutrition.carbs100),
+                            update: function (anim) {
+                                self.nutrition.carbs = Math.round(self.analyzedImage.nutrition.carbs.value * anim.progress / 100);
+                            },
+                        });
+
+                    nutritionTimeline.add({
+                        targets: '#hungry',
+                        opacity: 1,
+                        duration: 150
+                    });
+
+                    // recipes
+                    nutritionTimeline.add({
+                        targets: '.recipe',
+                        width: 240,
+                        opacity: 1,
+                        rotate: '1turn',
+                        delay: anime.stagger(150)
+                    });
+
+                    // logo
+                    nutritionTimeline.add({
+                        targets: '#spoonacular',
+                        opacity: 1,
+                        rotate: '1turn',
+                    });
+                },
+                // this will be called after the API responds with the image analysis
+                successCallback(data) {
+                    this.analyzedImage = data;
+                    this.analyzed = true;
+                    let self = this;
+                    Vue.nextTick(function () {
+                        self.animate();
+                    });
+                },
+                onUpload(responses) {
+                    this.successCallback(responses[0].data);
+                },
+                // we upload a file directly after it has been added to the upload container
+                onSelect(event) {
+                    this.analyzed = false;
+                    this.uploadFiles();
+                },
+                // using the default uploader, you may use another uploader instead
+                uploadFiles: function () {
+                    this.$refs.vueFileAgent.upload(this.uploadUrl + '?apiKey=' + this.spoonacularApiKey, this.uploadHeaders, this.foodImages);
+                },
+                // make a direct GET request with an image URL instead of a file
+                analyzeWithDemo() {
+                    anime({
+                        targets: '#demoImg',
+                        scale: [1, 0.5],
+                        opacity: [1, 0.5],
+                        rotate: [0, 10, -10],
+                        loop: true,
+                        direction: 'alternate',
+                        easing: 'easeInOutSine',
+                        duration: 800
+                    });
+
+                    
+                    let self = this;
+                    var xmlHttp = new XMLHttpRequest();
+                    xmlHttp.onreadystatechange = function () {
+                        if (xmlHttp.readyState == 4 && xmlHttp.status == 200) {
+                            self.successCallback(JSON.parse(xmlHttp.responseText));
+                        }
+                    }
+                    xmlHttp.open("GET", this.uploadUrl + '?apiKey=' + this.spoonacularApiKey + '&imageUrl=' + encodeURIComponent(this.demoImageUrl), true);
+                    xmlHttp.send(null);
+                }
+            },
+            components: {
+                vuefileagent: VueFileAgent.VueFileAgent
+            }
+        });
+    </script>
+ <style>
+        body {
+            background-color: rgb(241, 255, 241);
+        }
+
+        #app {
+            font-family: 'Indie Flower', cursive;
+            background-color: #fff;
+            max-width: 800px;
+            margin-left: auto;
+            margin-right: auto;
+            padding: 20px;
+            box-shadow: 0 1px 5px rgba(0, 0, 0, 0.2), 0 2px 2px rgba(0, 0, 0, 0.14), 0 3px 1px -2px rgba(0, 0, 0, 0.12);
+            border-radius: 22px;
+        }
+
+        #demoImg {
+            margin: 10px 80px 0 0;
+            cursor: pointer;
+            border-radius: 10px;
+        }
+
+        .vue-file-agent {
+            width: 190px;
+        }
+
+        #app>h1:first-of-type {
+            margin-top: 0;
+        }
+
+        h1 {
+            margin-top: 60px;
+        }
+
+        h1#hungry {
+            opacity: 0;
+        }
+
+        #imageChooser {
+            display: inline-block;
+            margin-right: 20px;
+            float: left;
+        }
+
+        .recipe {
+            display: inline-block;
+            max-width: 240px;
+            width: 50px;
+            opacity: 0;
+            margin-right: 12px;
+            margin-bottom: 12px;
+        }
+
+        .recipe h4 {
+            margin: 5px 0 5px 0;
+            max-height: 50px;
+            overflow: hidden;
+        }
+
+        .recipe img {
+            max-width: 100%;
+        }
+
+        .nutritionBar {
+            height: 30px;
+            margin-bottom: 10px;
+        }
+
+        .nutritionBar div {
+            height: 100%;
+            width: 0;
+            float: left;
+            margin-right: 20px;
+        }
+
+        .nutritionBar span {
+            font-weight: bold;
+            font-size: 20px;
+        }
+
+        p {
+            font-size: 22px;
+            display: inline;
+        }
+
+        span.category {
+            background-color: #29ad43;
+            color: white;
+            padding: 0 10px;
+            border-radius: 10px;
+        }
+
+        #calories div {
+            background-color: #ff5c5c;
+        }
+
+        #fat div {
+            background-color: #3fcc3f;
+        }
+
+        #protein div {
+            background-color: #7077ff;
+        }
+
+        #carbs div {
+            background-color: #ff9400;
+        }
+
+        #spoonacular {
+            margin-top: 50px;
+            opacity: 0;
+            margin-left: auto;
+            margin-right: auto;
+            width: 200px;
+            text-align: center;
+        }
+    </style><div id="goog-gt-tt" class="skiptranslate" dir="ltr"><div style="padding: 8px;"><div><div class="logo"><img src="./analisador de imagem colher_files/translate_24dp.png" width="20" height="20" alt="Google Tradutor"></div></div></div><div class="top" style="padding: 8px; float: left; width: 100%;"><h1 class="title gray">Texto original</h1></div><div class="middle" style="padding: 8px;"><div class="original-text"></div></div><div class="bottom" style="padding: 8px;"><div class="activity-links"><span class="activity-link">Sugerir uma tradução melhor</span><span class="activity-link"></span></div><div class="started-activity-container"><hr style="color: #CCC; background-color: #CCC; height: 1px; border: none;"><div class="activity-root"></div></div></div><div class="status-message" style="display: none;"></div></div>
+
+<div class="goog-te-spinner-pos"><div class="goog-te-spinner-animation"><svg xmlns="http://www.w3.org/2000/svg" class="goog-te-spinner" width="96px" height="96px" viewBox="0 0 66 66"><circle class="goog-te-spinner-path" fill="none" stroke-width="6" stroke-linecap="round" cx="33" cy="33" r="30"></circle></svg></div></div></body></html>

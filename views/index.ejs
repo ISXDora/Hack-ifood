@@ -41,6 +41,32 @@
     </div>
     <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs"> </script>
     <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/coco-ssd"> </script>
-    <script src="./script.js"></script>
+    <script>
+        const tf = require('@tensorflow/tfjs')
+        const cocoSsd = require('@tensorflow-models/coco-ssd')
+
+
+// Notice there is no 'import' statement. 'cocoSsd' and 'tf' is
+// available on the index-page because of the script tag above.
+
+const img = document.getElementById('img');
+
+// Load the model.
+cocoSsd.load().then(model => {
+  // detect objects in the image.
+  model.detect(img).then(predictions => {
+    console.log('Predictions: ', predictions);
+  });
+});
+
+
+model.
+cocoSsd.load().then(model => {
+  // detect objects in the image.
+  model.detect(img).then(predictions => {
+    console.log('Predictions: ', predictions);
+  });
+});
+    </script>
 </body>
 </html>
